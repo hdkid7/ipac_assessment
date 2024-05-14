@@ -1,7 +1,7 @@
 import './App.css';
 import SearchInput from "./Components/SearchInput";
 import {delayedFetch} from "./helper";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import FeatureCategory from "./Components/FeatureCategory";
 import Spinner from "./Components/Spinner";
 
@@ -13,16 +13,24 @@ function App() {
     let [loading, setLoading] = useState(true);
     let searchRef = useRef("");
 
+    useEffect(() => {
+        const fetchData = async () => {
+            await fetchWildLifeData(searchQuery);
+        }
+
+        fetchData()
+
+    }, [])
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         searchRef.current = searchQuery;
         const date = await fetchWildLifeData(searchQuery);
-
     }
 
     const fetchWildLifeData = async (searchQuery) => {
         setIsLoading(true)
-        const res = await delayedFetch("./ipac_response.json", 2000);
+        const res = await delayedFetch("./ipac_response.json", 500);
 
         let featureCategoriesObj = convertFeatureCategoriesArrToObj(res.data.featureCategories);
 
@@ -69,7 +77,7 @@ function App() {
 
     return (
     <div className="App ">
-        <SearchInput submitHandlerFn = {handleSubmit} searchQueryHandler = {setSearchQuery} query = {searchQuery}/>
+        <SearchInput submitHandlerFn = {handleSubmit} searchQueryHandler = {setSearchQuery} query = {searchQuery} isLoading={isLoading}/>
         <main>
             {isLoading ? <Spinner/> : <SearchResults filteredFeaturesAndCategories = {filteredFeaturesAndCategories} searchRef={searchRef}/>}
         </main>
