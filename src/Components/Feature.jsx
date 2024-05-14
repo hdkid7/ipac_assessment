@@ -1,3 +1,5 @@
+import {useState} from "react";
+
 export default function Feature({keywords, name, description}) {
     const keywordStr = keywords.join(", ")
 
