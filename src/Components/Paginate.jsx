@@ -3,6 +3,8 @@ import ReactPaginate from "react-paginate";
 import { AiFillLeftCircle, AiFillRightCircle } from "react-icons/ai"; // icons form react-icons
 import { IconContext } from "react-icons";
 
+//TODO: Find out how to add aria-label on current page
+//TODO: Refactor!!
 
 export function Paginate({data, setFilterData, featureCategoryName}) {
     const [page, setPage] = useState(0);
