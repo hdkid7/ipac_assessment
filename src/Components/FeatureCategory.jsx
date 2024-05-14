@@ -12,7 +12,7 @@ export default function FeatureCategory({name, featuresArr, description}) {
             <h1 className="text-2xl text-left font-bold">{name}</h1>
             <h2 className="text-l">{description ?? <i>No Description Provided...</i>}</h2>
             <ul className="h-[400px]">
-                {filterData.map(feature => <Feature description={feature.optionalDescription} keywords={feature.epKeywords} name={feature.displayName}/>)}
+                {filterData.map(feature => <Feature key={feature.sid.id} description={feature.optionalDescription} keywords={feature.epKeywords} name={feature.displayName}/>)}
             </ul>
             <Paginate data= {featuresArr} setFilterData={setFilterData} featureCategoryName = {name}/>
             <hr/>

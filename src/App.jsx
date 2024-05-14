@@ -1,55 +1,60 @@
 import './App.css';
 import SearchInput from "./Components/SearchInput";
 import {delayedFetch} from "./helper";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import FeatureCategory from "./Components/FeatureCategory";
-import ClockLoader from "react-spinners/ClockLoader";
-import Feature from "./Components/Feature";
-
-//TODO: Introduce pagination when a category returns 5+ results
+import Spinner from "./Components/Spinner";
 
 function App() {
     const [isLoading, setIsLoading] = useState(false);
     const [filteredJson, setFilteredJson] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
-    const [filteredFeatures, setFilteredFeatures] = useState([]);
+    const [filteredFeaturesAndCategories, setFilteredFeaturesAndCategories] = useState([]);
     let [loading, setLoading] = useState(true);
+    let searchRef = useRef("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        searchRef.current = searchQuery;
         const date = await fetchWildLifeData(searchQuery);
 
-        setSearchQuery("")
     }
 
     const fetchWildLifeData = async (searchQuery) => {
         setIsLoading(true)
         const res = await delayedFetch("./ipac_response.json", 2000);
 
-        let featureCategories = res.data.featureCategories.reduce((prev, curr) => (
-            {
-                ...prev,
-                [curr.sid.id] : {
-                    ...curr,
-                    features:[]
-                }
-                }) , {});
+        let featureCategoriesObj = convertFeatureCategoriesArrToObj(res.data.featureCategories);
 
         const filteredFeaturesArr = getFilteredFeatures(res.data.features, searchQuery);
 
         for(const x of filteredFeaturesArr) {
             const sid = x.categorySid.id;
 
-            featureCategories[sid].features.push(x);
+            featureCategoriesObj[sid].features.push(x);
         }
 
-        setFilteredFeatures(Object.values(featureCategories).toSorted((a,b) => a.sortOrder - b.sortOrder))
+        const sortedFeatureAndCategoryArr = removeCategoriesWithNoFeatures(Object.values(featureCategoriesObj).toSorted((a,b) => a.sortOrder - b.sortOrder));
+
+        setFilteredFeaturesAndCategories(sortedFeatureAndCategoryArr)
 
         setIsLoading(false)
     }
 
-    // First get list of features that have been matches by the query, can be matchedd by displayName OR epkeyword
+    function removeCategoriesWithNoFeatures(dataArr) {
+        return dataArr.filter(x => x.features.length !== 0)
+    }
+
+    function convertFeatureCategoriesArrToObj(data) {
+        return data.reduce((prev, curr) => (
+            {
+                ...prev,
+                [curr.sid.id] : {
+                    ...curr,
+                    features:[]
+                }
+            }) , {});
+    }
 
     function getFilteredFeatures(featureData, searchQuery) {
         return featureData.filter((jsonEntry) =>  {
@@ -62,52 +67,29 @@ function App() {
         })
     }
 
-    function filterData(data, query) {
-        return data;
-    }
-
-
     return (
     <div className="App ">
         <SearchInput submitHandlerFn = {handleSubmit} searchQueryHandler = {setSearchQuery} query = {searchQuery}/>
         <main>
-            {isLoading ? <Spinner/>
-             : filteredFeatures.map(
-                x => <FeatureCategory
-                    key={x.sid.id}
-                    name={x.name}
-                    description={x.optionalDescription}
-                    featuresArr={x.features}
-                />) }
+            {isLoading ? <Spinner/> : <SearchResults filteredFeaturesAndCategories = {filteredFeaturesAndCategories} searchRef={searchRef}/>}
         </main>
     </div>
   );
 }
 
-function Spinner(loading) {
-    const override = {
-        display: "block",
-        margin: "0 auto",
-        borderColor: "white",
-        marginTop: "3em"
-    };
+function SearchResults({filteredFeaturesAndCategories, searchRef}) {
+    if(searchRef.current && filteredFeaturesAndCategories.length === 0) return <p className="font-xl text-white mt-5">No search results! Consider making your search more broad.</p>;
 
     return (
         <>
-            <ClockLoader
-                color="#ffffff"
-                loading={loading}
-                size={50}
-                aria-label="Loading Spinner"
-                data-testid="loader"
-                cssOverride={override}
-            />
-
-            <p className="text-lg mt-5 text-white">
-                Loading Your Content...
-            </p>
-        </>
-    )
+            {searchRef.current && <p className="text-white text-xl mt-5">Search results for: "{searchRef.current}"</p>}
+            {filteredFeaturesAndCategories.map(
+            x => <FeatureCategory
+            key={x.sid.id}
+            name={x.name}
+            description={x.optionalDescription}
+            featuresArr={x.features}/>)}
+        </>)
 }
 
 export default App;

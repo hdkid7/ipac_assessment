@@ -3,7 +3,6 @@ import ReactPaginate from "react-paginate";
 import { AiFillLeftCircle, AiFillRightCircle } from "react-icons/ai"; // icons form react-icons
 import { IconContext } from "react-icons";
 
-//TODO: Find out how to add aria-label on current page
 //TODO: Refactor!!
 
 export function Paginate({data, setFilterData, featureCategoryName}) {
@@ -18,6 +17,12 @@ export function Paginate({data, setFilterData, featureCategoryName}) {
         );
     }, [page]);
 
+
+    const customAriaLabelBuilder = (prefix, idx) => {
+        return `Navigation for ${prefix} - page ${idx}`;
+    };
+
+
     return (
         <ReactPaginate
             containerClassName={"pagination"}
@@ -26,7 +31,7 @@ export function Paginate({data, setFilterData, featureCategoryName}) {
             onPageChange={(event) => setPage(event.selected)}
             pageCount={Math.ceil(data.length / numberOfElements)}
             pageRangeDisplayed={20}
-            extraAriaContext={`Navigation for ${featureCategoryName}`}
+            ariaLabelBuilder={(idx) => customAriaLabelBuilder(featureCategoryName, idx)}
             previousLabel={
                 <IconContext.Provider value={{ color: "#B8C1CC", size: "36px" }}>
                     <AiFillLeftCircle />
