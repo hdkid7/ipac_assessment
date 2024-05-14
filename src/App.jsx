@@ -5,7 +5,8 @@ import {useState} from "react";
 import FeatureCategory from "./Components/FeatureCategory";
 import Feature from "./Components/Feature";
 
-//TODO Feature matches on keywords and display name
+//TODO: Introduce pagination when a category returns 5+ results
+//TODO: Add Spinner instead of loading
 
 function App() {
     const [isLoading, setIsLoading] = useState(false);
