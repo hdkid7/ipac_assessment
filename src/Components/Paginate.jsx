@@ -3,8 +3,6 @@ import ReactPaginate from "react-paginate";
 import { AiFillLeftCircle, AiFillRightCircle } from "react-icons/ai"; // icons form react-icons
 import { IconContext } from "react-icons";
 
-//TODO: Refactor!!
-
 export function Paginate({data, setFilterData, featureCategoryName}) {
     const [page, setPage] = useState(0);
     const numberOfElements = 4;
@@ -21,7 +19,6 @@ export function Paginate({data, setFilterData, featureCategoryName}) {
     const customAriaLabelBuilder = (prefix, idx) => {
         return `Navigation for ${prefix} - page ${idx}`;
     };
-
 
     return (
         <ReactPaginate
