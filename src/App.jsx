@@ -7,10 +7,8 @@ import Spinner from "./Components/Spinner";
 
 function App() {
     const [isLoading, setIsLoading] = useState(false);
-    const [filteredJson, setFilteredJson] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredFeaturesAndCategories, setFilteredFeaturesAndCategories] = useState([]);
-    let [loading, setLoading] = useState(true);
     let searchRef = useRef("");
 
     useEffect(() => {
@@ -24,8 +22,8 @@ function App() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        searchRef.current = searchQuery;
-        const date = await fetchWildLifeData(searchQuery);
+        searchRef.current = searchQuery.toLowerCase();
+        await fetchWildLifeData(searchQuery.toLowerCase());
     }
 
     const fetchWildLifeData = async (searchQuery) => {
